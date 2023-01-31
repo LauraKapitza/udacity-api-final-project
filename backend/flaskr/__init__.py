@@ -1,4 +1,6 @@
 import os
+from operator import and_
+
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -112,17 +114,6 @@ def create_app(test_config=None):
         except:
             abort(422)
 
-    """
-    @TODO:
-    Create a POST endpoint to get questions based on a search term.
-    It should return any questions for whom the search term
-    is a substring of the question.
-
-    TEST: Search by any phrase. The questions list will update to include
-    only question that include that string within their question.
-    Try using the word "title" to start.
-    """
-
     @app.route("/questions/search", methods=["POST"])
     def search_questions():
         body = request.get_json()
@@ -163,17 +154,31 @@ def create_app(test_config=None):
             }
         )
 
-    """
-    @TODO:
-    Create a POST endpoint to get questions to play the quiz.
-    This endpoint should take category and previous question parameters
-    and return a random questions within the given category,
-    if provided, and that is not one of the previous questions.
+    @app.route("/quizzes", methods=["POST"])
+    def get_question_to_play():
+        body = request.get_json()
+        previous_questions = body.get("previous_questions", None)
+        quiz_category = body.get("quiz_category", None)
 
-    TEST: In the "Play" tab, after a user selects "All" or a category,
-    one question at a time is displayed, the user is allowed to answer
-    and shown whether they were correct or not.
-    """
+        filters = []
+
+        if quiz_category and "id" in quiz_category and quiz_category["id"] != 0:
+            filters.append(Question.category == quiz_category["id"])
+
+        if len(previous_questions):
+            filters.append(~Question.id.in_(previous_questions))
+
+        if filters:
+            question = Question.query.filter(*filters).first_or_404()
+        else:
+            question = Question.query.first()
+
+        return jsonify(
+            {
+                "success": True,
+                "question": question.format()
+            }
+        )
 
     @app.errorhandler(400)
     def bad_request(error):
