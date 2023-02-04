@@ -12,6 +12,12 @@
   width: 60%;
 }
 
+.categories-list > ul {
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+}
+
 .questions-list {
   flex-basis: 75%;
   text-align: center;
@@ -64,6 +70,14 @@ span.page-num {
 
 span.page-num.active {
   color: blue;
+}
+
+li.category-item {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  column-gap: 8px;
 }
 
 img.category {
