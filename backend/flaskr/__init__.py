@@ -132,7 +132,10 @@ def create_app(test_config=None):
 
         questions = Question.query.filter(Question.question.ilike('%{}%'.format(search))).order_by(Question.id).all()
         paginated_questions = paginate_questions(request.args, questions)
-        current_category = paginated_questions[0]['category'] if paginated_questions else None;
+
+        current_category = None
+        if paginated_questions and "category" in paginated_questions[0]:
+            current_category = Category.query.get_or_404(paginated_questions[0]['category']).type
 
         return jsonify(
             {

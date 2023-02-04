@@ -1,6 +1,7 @@
 import os
 import unittest
 import json
+
 from flask_sqlalchemy import SQLAlchemy
 
 from flaskr import create_app
@@ -138,6 +139,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["message"], "bad request")
 
     def test_search_questions_200(self):
+        self.categories_fixtures()
         self.questions_fixtures()
         res = self.client().post("/questions/search", json={"searchTerm": "test"})
         data = json.loads(res.data)
@@ -146,7 +148,16 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], True)
         self.assertEqual(data["questions"][0], self.question)
         self.assertEqual(data["total_questions"], 1)
-        self.assertEqual(data["current_category"], str(self.question['category']))
+        self.assertEqual(data["current_category"], str(self.category_type))
+
+    def test_search_questions_404(self):
+        self.questions_fixtures()
+        res = self.client().post("/questions/search", json={"searchTerm": "test"})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["message"], "resource not found")
 
     def test_search_questions_no_data_200(self):
         res = self.client().post("/questions/search", json={"searchTerm": "test"})

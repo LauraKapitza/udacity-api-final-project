@@ -33,13 +33,13 @@
 }
 ```
 
-### `GET '/categories/<int:category_id>/questions'`
+### `GET '/categories/${category_id}/questions'`
 
 - Returns a list of paginated question whose categories match a given category id.
 - Request Query: 
-  - page (optional) 
+  - page - integer (optional) 
 - Request Parameter: 
-  - category (optional)
+  - category - integer (optional)
 - Response schema:
 
 ```
@@ -130,7 +130,7 @@
 }
 ```
 
-### `DELETE '/questions/<int:question_id>'`
+### `DELETE '/questions/${question_id}'`
 
 - Deletes a question by its given id
 - Request Parameter: 
@@ -191,7 +191,7 @@ Also, it returns the current category of the first question in the list.
   "success": <Boolean>,
   "questions: List<Dict>,
   "total_questions": <int>
-  "current_category": <int>
+  "current_category": <str>
 }
 ```
 
@@ -199,7 +199,7 @@ Also, it returns the current category of the first question in the list.
 
 ```json
 {
-    "current_category": 5,
+    "current_category": "Entertainment",
     "questions": [
         {
             "answer": "Apollo 13",
