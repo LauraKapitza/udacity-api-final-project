@@ -40,7 +40,7 @@ class TriviaTestCase(unittest.TestCase):
         self.database_path = "postgres://{}/{}".format('localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
 
-        self.category_id = "1"
+        self.category_id = 1
         self.category_type = "Science"
         self.question_id = 1
         self.question = {"id": self.question_id,
@@ -206,15 +206,15 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], True)
         self.assertEqual(data["question"], self.question)
 
-    def test_retrieve_question_to_play_404(self):
+    def test_retrieve_question_to_play_no_question_200(self):
         self.questions_fixtures()
         res = self.client().post("/quizzes", json={"previous_questions": [self.question_id],
                                                    "quiz_category": {"id": self.category_id}})
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 404)
-        self.assertEqual(data["success"], False)
-        self.assertEqual(data["message"], "resource not found")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertEqual(data["question"], None)
 
 
 # Make the tests conveniently executable
