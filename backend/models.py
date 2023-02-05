@@ -1,12 +1,21 @@
 import os
+from os import environ
 from sqlalchemy import Column, String, Integer, create_engine
 from flask_sqlalchemy import SQLAlchemy
 import json
 
-database_name = 'trivia'
-database_path = 'postgresql://{}/{}'.format('localhost:5432', database_name)
+database_name = environ.get("DATABASE_NAME", "trivia")
+database_host = environ.get("DATABASE_HOST", "localhost")
+database_port = environ.get("DATABASE_PORT", "5432")
+
+database_path = "postgresql://{}:{}/{}".format(
+    database_host,
+    database_port,
+    database_name,
+)
 
 db = SQLAlchemy()
+
 
 """
 setup_db(app)
@@ -29,7 +38,7 @@ Question
 
 
 class Question(db.Model):
-    __tablename__ = 'questions'
+    __tablename__ = "questions"
 
     id = Column(Integer, primary_key=True)
     question = Column(String)
@@ -56,11 +65,11 @@ class Question(db.Model):
 
     def format(self):
         return {
-            'id': self.id,
-            'question': self.question,
-            'answer': self.answer,
-            'category': self.category,
-            'difficulty': self.difficulty
+            "id": self.id,
+            "question": self.question,
+            "answer": self.answer,
+            "category": self.category,
+            "difficulty": self.difficulty,
         }
 
 
@@ -71,7 +80,7 @@ Category
 
 
 class Category(db.Model):
-    __tablename__ = 'categories'
+    __tablename__ = "categories"
 
     id = Column(Integer, primary_key=True)
     type = Column(String)
@@ -80,7 +89,4 @@ class Category(db.Model):
         self.type = type
 
     def format(self):
-        return {
-            'id': self.id,
-            'type': self.type
-        }
+        return {"id": self.id, "type": self.type}

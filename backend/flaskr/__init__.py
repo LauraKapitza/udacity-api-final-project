@@ -24,14 +24,19 @@ def paginate_questions(request_queries, questions):
 
 def create_category_dictionary(categories):
     formatted_categories = [category.format() for category in categories]
-    dict_categories = dict((category['id'], category['type']) for category in formatted_categories)
+    dict_categories = dict(
+        (category["id"], category["type"]) for category in formatted_categories
+    )
     return dict_categories
 
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
-    setup_db(app)
+    # In test mode, we don't need to call setup_db.
+    # Our test file will do the setup
+    if not test_config:
+        setup_db(app)
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     # CORS Headers
@@ -76,7 +81,7 @@ def create_app(test_config=None):
                 "questions": paginated_questions,
                 "total_questions": len(questions),
                 "categories": dict_categories,
-                "current_category": current_category
+                "current_category": current_category,
             }
         )
 
@@ -92,7 +97,7 @@ def create_app(test_config=None):
             {
                 "success": True,
                 "deleted": question_id,
-                "message": "Question was successfully deleted."
+                "message": "Question was successfully deleted.",
             }
         )
 
@@ -111,15 +116,10 @@ def create_app(test_config=None):
         try:
             new_question = Question(question, answer, difficulty, category)
             new_question.insert()
-
-            return jsonify(
-                {
-                    "success": True
-                }
-            )
-
         except:
             abort(422)
+
+        return jsonify({"success": True})
 
     @app.route("/questions/search", methods=["POST"])
     def search_questions():
@@ -130,25 +130,33 @@ def create_app(test_config=None):
         if search is None:
             abort(400)
 
-        questions = Question.query.filter(Question.question.ilike('%{}%'.format(search))).order_by(Question.id).all()
+        questions = (
+            Question.query.filter(Question.question.ilike("%{}%".format(search)))
+            .order_by(Question.id)
+            .all()
+        )
         paginated_questions = paginate_questions(request.args, questions)
 
         current_category = None
         if paginated_questions and "category" in paginated_questions[0]:
-            current_category = Category.query.get_or_404(paginated_questions[0]['category']).type
+            current_category = Category.query.get_or_404(
+                paginated_questions[0]["category"]
+            ).type
 
         return jsonify(
             {
                 "success": True,
                 "questions": paginated_questions,
                 "total_questions": len(questions),
-                "current_category": current_category
+                "current_category": current_category,
             }
         )
 
     @app.route("/categories/<int:category_id>/questions")
     def get_questions_by_category(category_id):
-        questions = Question.query.filter(Question.category == category_id).order_by(Question.id)
+        questions = Question.query.filter(Question.category == category_id).order_by(
+            Question.id
+        )
         paginated_questions = paginate_questions(request.args, questions)
 
         return jsonify(
@@ -179,24 +187,21 @@ def create_app(test_config=None):
             question = Question.query.first()
 
         return jsonify(
-            {
-                "success": True,
-                "question": question.format() if question else None
-            }
+            {"success": True, "question": question.format() if question else None}
         )
 
     @app.errorhandler(400)
     def bad_request(error):
         return (
             jsonify({"success": False, "error": 400, "message": "bad request"}),
-            400
+            400,
         )
 
     @app.errorhandler(401)
     def bad_request(error):
         return (
             jsonify({"success": False, "error": 401, "message": "not authorized"}),
-            401
+            401,
         )
 
     @app.errorhandler(404)
@@ -223,7 +228,9 @@ def create_app(test_config=None):
     @app.errorhandler(500)
     def internal_server_error(error):
         return (
-            jsonify({"success": False, "error": 500, "message": "internal server error"}),
+            jsonify(
+                {"success": False, "error": 500, "message": "internal server error"}
+            ),
             500,
         )
 
