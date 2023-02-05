@@ -174,14 +174,14 @@ def create_app(test_config=None):
             filters.append(~Question.id.in_(previous_questions))
 
         if filters:
-            question = Question.query.filter(*filters).first_or_404()
+            question = Question.query.filter(*filters).first()
         else:
             question = Question.query.first()
 
         return jsonify(
             {
                 "success": True,
-                "question": question.format()
+                "question": question.format() if question else None
             }
         )
 
