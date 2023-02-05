@@ -148,8 +148,7 @@ def create_app(test_config=None):
 
     @app.route("/categories/<int:category_id>/questions")
     def get_questions_by_category(category_id):
-        # converts category id into string since the schema expects a string
-        questions = Question.query.filter(Question.category == str(category_id)).order_by(Question.id)
+        questions = Question.query.filter(Question.category == category_id).order_by(Question.id)
         paginated_questions = paginate_questions(request.args, questions)
 
         return jsonify(
@@ -169,8 +168,7 @@ def create_app(test_config=None):
         filters = []
 
         if quiz_category and "id" in quiz_category and quiz_category["id"] != 0:
-            # converts category id into string since the schema expects a string
-            filters.append(Question.category == str(quiz_category["id"]))
+            filters.append(Question.category == quiz_category["id"])
 
         if previous_questions:
             filters.append(~Question.id.in_(previous_questions))
