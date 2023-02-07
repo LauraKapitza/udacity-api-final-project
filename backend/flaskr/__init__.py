@@ -119,7 +119,7 @@ def create_app(test_config=None):
             abort(400)
 
         try:
-            new_question = Question(question, answer, difficulty, category)
+            new_question = Question(question, answer, category, difficulty)
             new_question.insert()
 
             return jsonify({"success": True})

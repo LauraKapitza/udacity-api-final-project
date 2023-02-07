@@ -133,6 +133,17 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
+        created_question = Question.query.order_by(Question.id.desc()).first()
+        self.assertEqual(
+            created_question.format(),
+            {
+                "answer": "Test answer",
+                "category": 1,
+                "difficulty": 5,
+                "id": created_question.id,
+                "question": "Test question",
+            },
+        )
 
     @patch("models.Question.insert")
     def test_create_question_422(self, mock_insert):
